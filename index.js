@@ -1,36 +1,29 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const mongoose = require('mongoose')
+const Note = require('./models/note')
+
+
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 
-
-const notes = [
-    { 
-      "id": "1",
-      "content": "HTML is easy",
-      "important": true
-    },
-    { 
-      "id": "2",
-      "content": "CSS is hard",
-      "important": false
-    },
-    { 
-      "id": "3",
-      "content": "Dan Abramov",
-      "important": false
-    },
-]
+const password = process.argv[2]
 
 
 app.get('/api/notes', (request, response) => {
-  response.json(notes)
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 
 app.get('/api/info', (request, response) => {
-  const date = new Date()
-  response.send(`<p>Notes has info for ${notes.length} notes</p><p>${date}</p>`)
+  Note.countDocuments({}).then(count => {
+    const date = new Date()
+    response.send(`<p>Notes has info for ${count} notes</p><p>${date}</p>`)
+  })
 })
 
 app.get('/api/notes/:id', (request, response) => {
